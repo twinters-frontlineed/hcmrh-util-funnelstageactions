@@ -1,16 +1,16 @@
 ﻿using Amazon.CDK;
-using Amazon.CDK.AWS.Chatbot;
-using Amazon.CDK.AWS.CodeStarNotifications;
 using Amazon.CDK.Pipelines;
+using Constructs;
 using Infrastructure_cdk.Constants;
+using Infrastructure_cdk.Stages;
 
 namespace Infrastructure_cdk.Stacks
 {
-    internal class DeploymentPipeline : Stack
+    internal class DeploymentPipelineStack : Stack
     {
-        internal DeploymentPipeline()
+        internal DeploymentPipelineStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
-            var source = CodePipelineSource.GitHub("FrontlineEducation/Infrastructure-cdk", "main", new GitHubSourceOptions
+            var source = CodePipelineSource.GitHub("FrontlineEducation/hcmrh-util-funnelstageactions", "main", new GitHubSourceOptions
             {
                 Authentication = SecretValue.SecretsManager("github-token")
             });
@@ -37,31 +37,27 @@ namespace Infrastructure_cdk.Stacks
 
             var createdBy = source.ToString().Replace("(", "").Replace(")", "");
 
-            pipeline.AddStage(new AppFunnelStageAction(this, Environments.DEVELOPMENT, new AppHireFileTransferStageProps
+            pipeline.AddStage(new FunnelStageAction(this, Environments.DEVELOPMENT, new FunnelStageActionProps
             {
                 Env = new Amazon.CDK.Environment
                 {
-                    Account = "671735518696",
-                    Region = "us-east-1"
+                    Account = AwsAccounts.DEVELOPMENT,
+                    Region = AwsConstants.REGION
                 },
                 CreatedBy = createdBy,
-                Environment = "aws_dev",
-                RecruitApiUri = "http://localhost:5000/",
-                ApiServiceAccountArn = "arn:aws:iam::756759416234:role/k8-qa-api-recruit-sa-role"
+                Environment = "aws_dev"
             }));
 
 
-            pipeline.AddStage(new AppHireFileTransfer(this, Environments.STAGING, new AppHireFileTransferStageProps
+            pipeline.AddStage(new FunnelStageAction(this, Environments.STAGING, new FunnelStageActionProps
             {
                 Env = new Amazon.CDK.Environment
                 {
-                    Account = "658713976729",
-                    Region = "us-east-1"
+                    Account = AwsAccounts.STAGING,
+                    Region = AwsConstants.REGION
                 },
                 CreatedBy = createdBy,
-                Environment = "aws_stage",
-                RecruitApiUri = "https://internal-api-proxy.ss.frontlineeducation.com/recruit-qa/api/",     // Proxy to api-recruit-qa.ss.frontlineeducation.com/{proxy}
-                ApiServiceAccountArn = "arn:aws:iam::756759416234:role/k8-qa-api-recruit-sa-role"
+                Environment = "aws_stage"
             }),
 
             new AddStageOpts
@@ -71,17 +67,15 @@ namespace Infrastructure_cdk.Stacks
                 }
             });
 
-            pipeline.AddStage(new AppHireFileTransfer(this, Environments.PRODUCTION, new AppHireFileTransferStageProps
+            pipeline.AddStage(new FunnelStageAction(this, Environments.PRODUCTION, new FunnelStageActionProps
             {
                 Env = new Amazon.CDK.Environment
                 {
-                    Account = "729029490000",
-                    Region = "us-east-1"
+                    Account = AwsAccounts.PRODUCTION,
+                    Region = AwsConstants.REGION
                 },
                 CreatedBy = createdBy,
-                Environment = "aws_prod",
-                RecruitApiUri = "https://internal-api-proxy.use1.frontlineeducation.com/recruit-prod/api/",     // Proxy to api-recruit.ss.frontlineeducation.com/{proxy}
-                ApiServiceAccountArn = "arn:aws:iam::381203884180:role/k8-prod-api-recruit-sa-role"
+                Environment = "aws_prod"
             }),
 
             new AddStageOpts
