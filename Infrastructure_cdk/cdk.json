@@ -1,0 +1,8 @@
+{
+  "app": "dotnet run --project Infrastructure_cdk.csproj",
+  "watch": {
+    "include": ["**/*.cs", "*.csproj"],
+    "exclude": ["bin/", "obj/"]
+  },
+  "requireApproval": "never"
+}

@@ -4,13 +4,30 @@ using Infrastructure_cdk.Stacks;
 
 var app = new App();
 
-new DeploymentPipelineStack(app, AwsConstants.DEPLOYMENT_PIPELINE_ID, new StackProps
+
+if (app.Node.TryGetContext("env")?.ToString()?.Equals("dev", StringComparison.CurrentCultureIgnoreCase) ?? false)
 {
-    Env = new Amazon.CDK.Environment
+    Console.WriteLine("Dev environment synth");
+    new FunnelStageActionStack(app, new StackProps
     {
-        Account = AwsAccounts.CICD,
-        Region = AwsConstants.REGION
-    }
-});
+        Env = new Amazon.CDK.Environment
+        {
+            Account = AwsAccounts.DEVELOPMENT,
+            Region = AwsConstants.REGION
+        }
+    });
+}
+else
+{
+    Console.WriteLine("Non-dev environment synth");
+    new DeploymentPipelineStack(app, AwsConstants.DEPLOYMENT_PIPELINE_ID, new StackProps
+    {
+        Env = new Amazon.CDK.Environment
+        {
+            Account = AwsAccounts.CICD,
+            Region = AwsConstants.REGION
+        }
+    });
+}
 
 app.Synth();

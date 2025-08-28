@@ -14,8 +14,7 @@ public class FunnelStageAction : Stage
 {
     public FunnelStageAction(Construct scope, string id, FunnelStageActionProps props) : base(scope, id, props)
     {
-        // ReSharper disable once UnusedVariable
-        FunnelStageActionStack stageActionStack = new FunnelStageActionStack(this, "FileTransfer", new StackProps
+        new FunnelStageActionStack(this, new StackProps
         {
             Env = props.Env
         });

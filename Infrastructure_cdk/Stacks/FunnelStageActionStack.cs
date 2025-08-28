@@ -7,7 +7,7 @@ namespace Infrastructure_cdk.Stacks
 {
     internal class FunnelStageActionStack: Stack
     {
-        internal FunnelStageActionStack(Construct scope, string id, StackProps props) : base(scope, id, props)
+        internal FunnelStageActionStack(Construct scope, StackProps props) : base(scope, AwsConstants.FUNNEL_STAGE_ACTION_STACK_ID, props)
         {
             var deadLetterQueue = new Queue(this, AwsConstants.FUNNEL_STAGE_ACTION_DEAD_LETTER_QUEUE_ID, new QueueProps
             {
@@ -18,7 +18,7 @@ namespace Infrastructure_cdk.Stacks
             var funnelStageActionQueue = new Queue(this, AwsConstants.FUNNEL_STAGE_ACTION_QUEUE_ID, new QueueProps
             {
                 QueueName = AwsConstants.FUNNEL_STAGE_ACTION_QUEUE_ID,
-                DeadLetterQueue = new DeadLetterQueue() { Queue = deadLetterQueue }
+                DeadLetterQueue = new DeadLetterQueue() { Queue = deadLetterQueue, MaxReceiveCount = AwsConstants.DLQ_MAX_RECEIVE_COUNT }
             });
         }
     }

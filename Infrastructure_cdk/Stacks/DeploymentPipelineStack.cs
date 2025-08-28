@@ -37,18 +37,6 @@ namespace Infrastructure_cdk.Stacks
 
             var createdBy = source.ToString().Replace("(", "").Replace(")", "");
 
-            pipeline.AddStage(new FunnelStageAction(this, Environments.DEVELOPMENT, new FunnelStageActionProps
-            {
-                Env = new Amazon.CDK.Environment
-                {
-                    Account = AwsAccounts.DEVELOPMENT,
-                    Region = AwsConstants.REGION
-                },
-                CreatedBy = createdBy,
-                Environment = "aws_dev"
-            }));
-
-
             pipeline.AddStage(new FunnelStageAction(this, Environments.STAGING, new FunnelStageActionProps
             {
                 Env = new Amazon.CDK.Environment
